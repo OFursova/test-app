@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BookResourse;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
@@ -10,11 +11,12 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
+        //return response()->json(Book::all());
+        return BookResourse::collection(Book::all());
     }
 
     /**
@@ -35,18 +37,18 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validated();
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Book  $book
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\BookResourse
      */
     public function show(Book $book)
     {
-        //
+        return new BookResourse(Book::findOrFail($book->id));
     }
 
     /**
