@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransferController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -14,11 +15,13 @@ use Illuminate\Support\Facades\Auth;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// for Vue frontend realization
+//Route::get('/{any}', [\App\Http\Controllers\SpaController::class,'index'])->where('any', '.*');
 
-Route::get('/{any}', [\App\Http\Controllers\SpaController::class,'index'])->where('any', '.*');
-
+// ServiceContainer practice
 //Route::post('/go', [TransferController::class, 'transfer']);
 
 Auth::routes();
 
-//Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+

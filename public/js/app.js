@@ -1847,6 +1847,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Http */ "./resources/js/Http.js");
 //
 //
 //
@@ -1884,6 +1885,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -1900,7 +1922,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/sanctum/csrf-cookie").then(function (response) {
-        axios__WEBPACK_IMPORTED_MODULE_0___default().post("/login", _this.formData).then(function (response) {
+        _Http__WEBPACK_IMPORTED_MODULE_1__.default.post("/login", _this.formData).then(function (response) {
           console.log("User signed in!");
         })["catch"](function (error) {
           return console.log(error);
@@ -1984,6 +2006,106 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Http.js":
+/*!******************************!*\
+  !*** ./resources/js/Http.js ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+ // Automatically add CSRF token to every outgoing request
+
+var baseURL = window.App.base_url;
+var headers = {
+  "X-CSRF-TOKEN": window.Laravel.csrfToken,
+  "X-Requested-With": "XMLHttpRequest"
+};
+var Http = axios__WEBPACK_IMPORTED_MODULE_0___default().create({
+  baseURL: baseURL,
+  headers: headers
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Http); // Response interceptor
+
+Http.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  return httpFail(error);
+});
+
+function httpFail(error) {
+  // Reject on Laravel-driven validation errors
+  if (error.response && error.response.status === 422) {
+    return Promise.reject(error);
+  } // Refresh tokens and reject to be further handled be the request initiator
+
+
+  if (error.response && error.response.status === 419) {
+    return refreshAppTokens().then(function () {
+      return Promise.reject(error);
+    });
+  } // If internal error
+
+
+  if (error.message && !error.response) {
+    // Due to a possible bug in Laravel Echo, whitelist Echo server error
+    // See explanation above
+    if (error.message === "Cannot read property 'socketId' of undefined") {
+      // showError(error.message);
+      return Promise.resolve(error);
+    } // Display any other errors to the user and reject
+
+
+    showError(error.message);
+    return Promise.reject(error);
+  } // Redirect to log in page if unauthenticated
+
+
+  if (error.response && error.response.status === 401) {
+    var router = window.router;
+    var segments = router.currentRoute.path.split("/");
+    var isAuth = segments.length > 1 && segments[1] === "auth"; // If not on main page and not on /auth page (change this block or remove accordingly to your app logic)
+
+    if (router.currentRoute.path !== "/" && !isAuth) {
+      store.dispatch("resetAuthorizedUser");
+      window.router.push("/auth/login?back=".concat(router.currentRoute.path));
+    }
+
+    return Promise.reject(error);
+  } // Redirect if the backend asks it
+
+
+  if (error.response && error.response.status === 402 && error.response.data.redirect) {
+    window.router.push(error.response.data.redirect);
+    return Promise.reject(error);
+  } // Show all other errors
+
+
+  showHttpError(error);
+  return Promise.reject(error);
+}
+
+function refreshAppTokens() {
+  // Retrieve a new page with a fresh token
+  axios__WEBPACK_IMPORTED_MODULE_0___default().get("/").then(function (_ref) {
+    var data = _ref.data;
+    var wrapper = document.createElement("div");
+    wrapper.innerHTML = data;
+    return div.querySelector("meta[name=csrf-token]").getAttribute("content");
+  }).then(function (token) {
+    (axios__WEBPACK_IMPORTED_MODULE_0___default().defaults.headers["X-CSRF-TOKEN"]) = token;
+    window.Laravel.csrfToken = token;
+    document.querySelector("meta[name=csrf-token]").setAttribute("content", token);
+  });
+}
+
+/***/ }),
+
 /***/ "./resources/js/app.js":
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
@@ -2014,23 +2136,23 @@ vue__WEBPACK_IMPORTED_MODULE_0__.default.use(vue_router__WEBPACK_IMPORTED_MODULE
 
 
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__.default({
-  mode: 'history',
+  mode: "history",
   routes: [{
-    path: '/',
-    name: 'home',
+    path: "/",
+    name: "home",
     component: _views_Home__WEBPACK_IMPORTED_MODULE_4__.default
   }, {
-    path: '/hello',
-    name: 'hello',
+    path: "/hello",
+    name: "hello",
     component: _views_Hello__WEBPACK_IMPORTED_MODULE_3__.default
   }, {
-    path: '/books',
-    name: 'books.index',
+    path: "/books",
+    name: "books.index",
     component: _views_BooksIndex__WEBPACK_IMPORTED_MODULE_5__.default
   }]
 });
 var app = new vue__WEBPACK_IMPORTED_MODULE_0__.default({
-  el: '#app',
+  el: "#app",
   components: {
     App: _views_App__WEBPACK_IMPORTED_MODULE_2__.default
   },
@@ -2088,6 +2210,22 @@ window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "http://test-app";
+var token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+  window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
+} else {
+  console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
+} // axios.interceptors.response.use(
+//     function(response) {
+//         return response;
+//     },
+//     function(error) {
+//         if (error.response.status !== 419) return Promise.reject(error);
+//         window.location.reload();
+//     }
+// );
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
@@ -37797,7 +37935,11 @@ var render = function() {
                 }
               },
               [
-                _c("div", { staticClass: "form-row" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Email address")
+                  ]),
+                  _vm._v(" "),
                   _c("input", {
                     directives: [
                       {
@@ -37807,7 +37949,13 @@ var render = function() {
                         expression: "formData.email"
                       }
                     ],
-                    attrs: { type: "email" },
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "email",
+                      id: "exampleInputEmail1",
+                      "aria-describedby": "emailHelp",
+                      placeholder: "Enter email"
+                    },
                     domProps: { value: _vm.formData.email },
                     on: {
                       input: function($event) {
@@ -37817,10 +37965,27 @@ var render = function() {
                         _vm.$set(_vm.formData, "email", $event.target.value)
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "small",
+                    {
+                      staticClass: "form-text text-muted",
+                      attrs: { id: "emailHelp" }
+                    },
+                    [
+                      _vm._v(
+                        "We'll never share your email with anyone\n                        else."
+                      )
+                    ]
+                  )
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "form-row" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputPassword1" } }, [
+                    _vm._v("Password")
+                  ]),
+                  _vm._v(" "),
                   _c("input", {
                     directives: [
                       {
@@ -37830,7 +37995,12 @@ var render = function() {
                         expression: "formData.password"
                       }
                     ],
-                    attrs: { type: "password" },
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "password",
+                      id: "exampleInputPassword1",
+                      placeholder: "Password"
+                    },
                     domProps: { value: _vm.formData.password },
                     on: {
                       input: function($event) {
@@ -37843,7 +38013,11 @@ var render = function() {
                   })
                 ]),
                 _vm._v(" "),
-                _vm._m(0)
+                _c(
+                  "button",
+                  { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+                  [_vm._v("\n                    Submit\n                ")]
+                )
               ]
             )
           ])
@@ -37851,16 +38025,7 @@ var render = function() {
       : _c("div", { staticClass: "row" }, [_c("router-view")], 1)
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-row" }, [
-      _c("button", { attrs: { type: "submit" } }, [_vm._v("Sign In")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
