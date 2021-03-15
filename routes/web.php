@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 */
 // for Vue frontend realization
 Route::get('/{any}', [\App\Http\Controllers\SpaController::class,'index'])->where('any', '.*');
+//Route::get('/token', [\App\Http\Controllers\SpaController::class,'token']);
 
 // ServiceContainer practice
 //Route::post('/go', [TransferController::class, 'transfer']);
