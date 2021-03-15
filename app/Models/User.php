@@ -42,4 +42,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function token(User $user)
+    {
+        $token = $user->createToken('test');
+        dd($token);
+    }
 }

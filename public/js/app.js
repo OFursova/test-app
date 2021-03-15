@@ -1847,7 +1847,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Http */ "./resources/js/Http.js");
 //
 //
 //
@@ -1905,7 +1904,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+ //import Http from "../Http";
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -1922,8 +1921,11 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default().get("/sanctum/csrf-cookie").then(function (response) {
-        _Http__WEBPACK_IMPORTED_MODULE_1__.default.post("/login", _this.formData).then(function (response) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default().post("/login", _this.formData).then(function (response) {
           console.log("User signed in!");
+          axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/book").then(function (response) {
+            console.log(response.data.data);
+          });
         })["catch"](function (error) {
           return console.log(error);
         }); // credentials didn't match
@@ -2006,106 +2008,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/Http.js":
-/*!******************************!*\
-  !*** ./resources/js/Http.js ***!
-  \******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
- // Automatically add CSRF token to every outgoing request
-
-var baseURL = window.App.base_url;
-var headers = {
-  "X-CSRF-TOKEN": window.Laravel.csrfToken,
-  "X-Requested-With": "XMLHttpRequest"
-};
-var Http = axios__WEBPACK_IMPORTED_MODULE_0___default().create({
-  baseURL: baseURL,
-  headers: headers
-});
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Http); // Response interceptor
-
-Http.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  return httpFail(error);
-});
-
-function httpFail(error) {
-  // Reject on Laravel-driven validation errors
-  if (error.response && error.response.status === 422) {
-    return Promise.reject(error);
-  } // Refresh tokens and reject to be further handled be the request initiator
-
-
-  if (error.response && error.response.status === 419) {
-    return refreshAppTokens().then(function () {
-      return Promise.reject(error);
-    });
-  } // If internal error
-
-
-  if (error.message && !error.response) {
-    // Due to a possible bug in Laravel Echo, whitelist Echo server error
-    // See explanation above
-    if (error.message === "Cannot read property 'socketId' of undefined") {
-      // showError(error.message);
-      return Promise.resolve(error);
-    } // Display any other errors to the user and reject
-
-
-    showError(error.message);
-    return Promise.reject(error);
-  } // Redirect to log in page if unauthenticated
-
-
-  if (error.response && error.response.status === 401) {
-    var router = window.router;
-    var segments = router.currentRoute.path.split("/");
-    var isAuth = segments.length > 1 && segments[1] === "auth"; // If not on main page and not on /auth page (change this block or remove accordingly to your app logic)
-
-    if (router.currentRoute.path !== "/" && !isAuth) {
-      store.dispatch("resetAuthorizedUser");
-      window.router.push("/auth/login?back=".concat(router.currentRoute.path));
-    }
-
-    return Promise.reject(error);
-  } // Redirect if the backend asks it
-
-
-  if (error.response && error.response.status === 402 && error.response.data.redirect) {
-    window.router.push(error.response.data.redirect);
-    return Promise.reject(error);
-  } // Show all other errors
-
-
-  showHttpError(error);
-  return Promise.reject(error);
-}
-
-function refreshAppTokens() {
-  // Retrieve a new page with a fresh token
-  axios__WEBPACK_IMPORTED_MODULE_0___default().get("/").then(function (_ref) {
-    var data = _ref.data;
-    var wrapper = document.createElement("div");
-    wrapper.innerHTML = data;
-    return div.querySelector("meta[name=csrf-token]").getAttribute("content");
-  }).then(function (token) {
-    (axios__WEBPACK_IMPORTED_MODULE_0___default().defaults.headers["X-CSRF-TOKEN"]) = token;
-    window.Laravel.csrfToken = token;
-    document.querySelector("meta[name=csrf-token]").setAttribute("content", token);
-  });
-}
-
-/***/ }),
-
 /***/ "./resources/js/app.js":
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
@@ -2120,14 +2022,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _views_Hello__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./views/Hello */ "./resources/js/views/Hello.vue");
 /* harmony import */ var _views_Home__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./views/Home */ "./resources/js/views/Home.vue");
 /* harmony import */ var _views_BooksIndex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./views/BooksIndex */ "./resources/js/views/BooksIndex.vue");
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); //window.Vue = require('vue').default;
+__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); // FOR THE VUE REALIZATION UNCOMMENT FOLLOWING:
 
 
+window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js").default;
 
 
 vue__WEBPACK_IMPORTED_MODULE_0__.default.use(vue_router__WEBPACK_IMPORTED_MODULE_1__.default);
@@ -2216,16 +2114,7 @@ if (token) {
   window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
 } else {
   console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
-} // axios.interceptors.response.use(
-//     function(response) {
-//         return response;
-//     },
-//     function(error) {
-//         if (error.response.status !== 419) return Promise.reject(error);
-//         window.location.reload();
-//     }
-// );
-
+}
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

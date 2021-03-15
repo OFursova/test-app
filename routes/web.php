@@ -16,12 +16,12 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 // for Vue frontend realization
-//Route::get('/{any}', [\App\Http\Controllers\SpaController::class,'index'])->where('any', '.*');
+Route::get('/{any}', [\App\Http\Controllers\SpaController::class,'index'])->where('any', '.*');
 
 // ServiceContainer practice
 //Route::post('/go', [TransferController::class, 'transfer']);
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+//Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

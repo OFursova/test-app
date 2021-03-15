@@ -2,44 +2,44 @@ require("./bootstrap");
 
 // FOR THE VUE REALIZATION UNCOMMENT FOLLOWING:
 
-//window.Vue = require('vue').default;
+window.Vue = require("vue").default;
 
-// import Vue from "vue";
-// import VueRouter from "vue-router";
+import Vue from "vue";
+import VueRouter from "vue-router";
 
-// Vue.use(VueRouter);
+Vue.use(VueRouter);
 
-// import App from "./views/App";
-// import Hello from "./views/Hello";
-// import Home from "./views/Home";
-// import BooksIndex from "./views/BooksIndex";
+import App from "./views/App";
+import Hello from "./views/Hello";
+import Home from "./views/Home";
+import BooksIndex from "./views/BooksIndex";
 
-// const router = new VueRouter({
-//     mode: "history",
-//     routes: [
-//         {
-//             path: "/",
-//             name: "home",
-//             component: Home
-//         },
-//         {
-//             path: "/hello",
-//             name: "hello",
-//             component: Hello
-//         },
-//         {
-//             path: "/books",
-//             name: "books.index",
-//             component: BooksIndex
-//         }
-//     ]
-// });
+const router = new VueRouter({
+    mode: "history",
+    routes: [
+        {
+            path: "/",
+            name: "home",
+            component: Home
+        },
+        {
+            path: "/hello",
+            name: "hello",
+            component: Hello
+        },
+        {
+            path: "/books",
+            name: "books.index",
+            component: BooksIndex
+        }
+    ]
+});
 
-// const app = new Vue({
-//     el: "#app",
-//     components: { App },
-//     router
-// });
+const app = new Vue({
+    el: "#app",
+    components: { App },
+    router
+});
 
 /**
  * The following block of code may be used to automatically register your

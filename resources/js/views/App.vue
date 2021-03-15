@@ -57,7 +57,7 @@
 </template>
 <script>
 import axios from "axios";
-import Http from "../Http";
+//import Http from "../Http";
 export default {
     data() {
         return {
@@ -71,9 +71,13 @@ export default {
     methods: {
         handleLogin() {
             axios.get("/sanctum/csrf-cookie").then(response => {
-                Http.post("/login", this.formData)
+                axios
+                    .post("/login", this.formData)
                     .then(response => {
                         console.log("User signed in!");
+                        axios.get("/api/book").then(response => {
+                            console.log(response.data.data);
+                        });
                     })
                     .catch(error => console.log(error)); // credentials didn't match
             });
