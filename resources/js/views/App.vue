@@ -18,6 +18,7 @@
         <div v-if="!loggedIn" class="row">
             <div class="col-12">
                 <form action="#" @submit.prevent="handleLogin">
+                    <input type="hidden" name="_token" v-bind:value="csrf" />
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
                         <input
@@ -56,11 +57,17 @@
     </div>
 </template>
 <script>
-import axios from "axios";
+//import axios from "axios";
 //import Http from "../Http";
 export default {
     data() {
         return {
+            _token: document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content"),
+            csrf: document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content"),
             loggedIn: false,
             formData: {
                 email: "",
@@ -71,13 +78,11 @@ export default {
     methods: {
         handleLogin() {
             axios.get("/sanctum/csrf-cookie").then(response => {
+                console.log("sanctum stage");
                 axios
                     .post("/login", this.formData)
                     .then(response => {
                         console.log("User signed in!");
-                        axios.get("/api/book").then(response => {
-                            console.log(response.data.data);
-                        });
                     })
                     .catch(error => console.log(error)); // credentials didn't match
             });

@@ -41,17 +41,20 @@ export default {
         fetchData() {
             this.error = this.books = null;
             this.loading = true;
-            axios
-                .get("/api/book")
-                .then(response => {
-                    //console.log(response.data.data);
-                    this.loading = false;
-                    this.books = response.data.data;
-                })
-                .catch(error => {
-                    this.loading = false;
-                    this.error = error.response.data.message || error.message;
-                });
+            axios.get("/sanctum/csrf-cookie").then(response => {
+                axios
+                    .get("/api/book")
+                    .then(response => {
+                        console.log(response.data.data);
+                        this.loading = false;
+                        this.books = response.data.data;
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.error =
+                            error.response.data.message || error.message;
+                    });
+            });
         }
     }
 };

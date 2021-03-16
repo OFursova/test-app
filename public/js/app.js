@@ -1845,8 +1845,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -1904,11 +1902,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
- //import Http from "../Http";
-
+//
+//import axios from "axios";
+//import Http from "../Http";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
       loggedIn: false,
       formData: {
         email: "",
@@ -1920,12 +1921,10 @@ __webpack_require__.r(__webpack_exports__);
     handleLogin: function handleLogin() {
       var _this = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/sanctum/csrf-cookie").then(function (response) {
-        axios__WEBPACK_IMPORTED_MODULE_0___default().post("/login", _this.formData).then(function (response) {
+      axios.get("/sanctum/csrf-cookie").then(function (response) {
+        console.log("sanctum stage");
+        axios.post("/login", _this.formData).then(function (response) {
           console.log("User signed in!");
-          axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/book").then(function (response) {
-            console.log(response.data.data);
-          });
         })["catch"](function (error) {
           return console.log(error);
         }); // credentials didn't match
@@ -1994,13 +1993,15 @@ __webpack_require__.r(__webpack_exports__);
 
       this.error = this.books = null;
       this.loading = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/book").then(function (response) {
-        //console.log(response.data.data);
-        _this.loading = false;
-        _this.books = response.data.data;
-      })["catch"](function (error) {
-        _this.loading = false;
-        _this.error = error.response.data.message || error.message;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/sanctum/csrf-cookie").then(function (response) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/book").then(function (response) {
+          console.log(response.data.data);
+          _this.loading = false;
+          _this.books = response.data.data;
+        })["catch"](function (error) {
+          _this.loading = false;
+          _this.error = error.response.data.message || error.message;
+        });
       });
     }
   }
@@ -2107,14 +2108,19 @@ try {
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://test-app";
-var token = document.head.querySelector('meta[name="csrf-token"]');
+axios.defaults.baseURL = "http://test-app"; // Vue.http.interceptors.push((request, next) => {
+//     request.headers.set('X-CSRF-TOKEN', MyApp.csrfToken);
+//     next();
+// });
+// let token = document.head.querySelector('meta[name="csrf-token"]');
+// if (token) {
+//     window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
+// } else {
+//     console.error(
+//         "CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token"
+//     );
+// }
 
-if (token) {
-  window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
-} else {
-  console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
-}
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
@@ -37824,6 +37830,11 @@ var render = function() {
                 }
               },
               [
+                _c("input", {
+                  attrs: { type: "hidden", name: "_token" },
+                  domProps: { value: _vm.csrf }
+                }),
+                _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", { attrs: { for: "exampleInputEmail1" } }, [
                     _vm._v("Email address")

@@ -26,15 +26,20 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "http://test-app";
 
-let token = document.head.querySelector('meta[name="csrf-token"]');
+// Vue.http.interceptors.push((request, next) => {
+//     request.headers.set('X-CSRF-TOKEN', MyApp.csrfToken);
+//     next();
+// });
 
-if (token) {
-    window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
-} else {
-    console.error(
-        "CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token"
-    );
-}
+// let token = document.head.querySelector('meta[name="csrf-token"]');
+
+// if (token) {
+//     window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
+// } else {
+//     console.error(
+//         "CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token"
+//     );
+// }
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

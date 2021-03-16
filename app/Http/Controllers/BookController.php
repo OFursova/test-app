@@ -39,6 +39,8 @@ class BookController extends Controller
     public function store(StoreBookRequest $request)
     {
         $validated = $request->validated();
+        $newBook = Book::create($validated);
+        return new BookResourse(Book::last());
     }
 
     /**
